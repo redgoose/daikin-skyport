@@ -23,7 +23,7 @@ func TestGetDevices(t *testing.T) {
 		MatchType("json").
 		JSON(map[string]string{"email": email, "password": password}).
 		Reply(200).
-		JSON(map[string]string{"accessToken": accessToken})
+		JSON(map[string]interface{}{"accessToken": accessToken, "accessTokenExpiresIn": 3600})
 
 	gock.New(urlBase).
 		Get("/devices").

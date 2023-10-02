@@ -10,8 +10,10 @@ import (
 )
 
 type Daikin struct {
-	Email    string
-	Password string
+	Email       string
+	Password    string
+	tokenCache  *Token
+	tokenExpiry time.Time
 }
 
 type Token struct {
@@ -46,6 +48,11 @@ func New(email string, password string) *Daikin {
 }
 
 func (d *Daikin) getToken() (string, error) {
+
+	if d.tokenCache != nil && time.Now().Before(d.tokenExpiry) {
+		return d.tokenCache.AccessToken, nil
+	}
+
 	body := []byte(`{
 		"email": "` + d.Email + `",
 		"password": "` + d.Password + `"
@@ -74,6 +81,9 @@ func (d *Daikin) getToken() (string, error) {
 	if derr != nil {
 		return "", errors.New("json decode failed")
 	}
+
+	d.tokenCache = token
+	d.tokenExpiry = time.Now().Add(time.Duration(token.AccessTokenExpiresIn) * time.Second)
 
 	return token.AccessToken, nil
 }
