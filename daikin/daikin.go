@@ -111,7 +111,7 @@ func (d *Daikin) GetDevices() (*Devices, error) {
 	defer res.Body.Close()
 
 	if res.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("list devices request returned a non-success response: %s", res.Status)
+		return nil, fmt.Errorf("get devices request returned a non-success response: %s", res.Status)
 	}
 
 	var devices Devices
