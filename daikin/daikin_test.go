@@ -20,7 +20,6 @@ func TestGetDevices(t *testing.T) {
 
 	gock.New(urlBase).
 		Post("/users/auth/login").
-		MatchType("json").
 		JSON(map[string]string{"email": email, "password": password}).
 		Reply(200).
 		JSON(map[string]interface{}{"accessToken": accessToken, "accessTokenExpiresIn": 3600})
@@ -29,13 +28,16 @@ func TestGetDevices(t *testing.T) {
 		Get("/devices").
 		MatchHeader("Authorization", "Bearer "+accessToken).
 		Reply(200).
-		BodyString(`[{"id":"0000000-0000-0000-0000-000000000000","locationId":"0000000-1111-1111-1111-000000000000","name":"Main Room","model":"ONEPLUS","firmwareVersion":"3.2.19","createdDate":1691622040,"hasOwner":true,"hasWrite":true}]`)
+		JSON(`[{"id":"0000000-0000-0000-0000-000000000000","locationId":"0000000-1111-1111-1111-000000000000","name":"Main Room","model":"ONEPLUS","firmwareVersion":"3.2.19","createdDate":1691622040,"hasOwner":true,"hasWrite":true}]`)
 
 	d := daikin.New(email, password)
-	devices, _ := d.GetDevices()
+	devices, err := d.GetDevices()
 
 	t.Log(devices)
 
+	st.Expect(t, err, nil)
+	st.Expect(t, len(*devices), 1)
 	st.Expect(t, (*devices)[0].Id, "0000000-0000-0000-0000-000000000000")
+
 	st.Expect(t, gock.IsDone(), true)
 }
