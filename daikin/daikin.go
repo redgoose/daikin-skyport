@@ -79,7 +79,7 @@ func (d *Daikin) getToken() (string, error) {
 }
 
 func (d *Daikin) GetDevices() (*Devices, error) {
-	r, err := http.NewRequest("GET", urlBase+"/v1/devices", nil)
+	r, err := http.NewRequest("GET", urlBase+"/devices", nil)
 	if err != nil {
 		return nil, errors.New("http.NewRequest failed")
 	}
