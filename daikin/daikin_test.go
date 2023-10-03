@@ -71,8 +71,9 @@ func TestGetDeviceInfo(t *testing.T) {
 
 	st.Expect(t, err, nil)
 	st.Expect(t, (*deviceInfo).Mode, daikin.ModeCool)
-	st.Expect(t, (*deviceInfo).CSPActive, float32(22))
-	st.Expect(t, (*deviceInfo).HSPActive, float32(17.5))
+	st.Expect(t, (*deviceInfo).EquipmentStatus, daikin.EquipmentStatusOvercool)
+	st.Expect(t, (*deviceInfo).CSPHome, float32(22))
+	st.Expect(t, (*deviceInfo).HSPHome, float32(17.5))
 
 	st.Expect(t, gock.IsDone(), true)
 }

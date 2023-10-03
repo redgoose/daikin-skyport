@@ -74,8 +74,8 @@ const (
 )
 
 type DeviceInfo struct {
-	CSPActive              float32           `json:"cspActive"`
-	HSPActive              float32           `json:"hspActive"`
+	CSPHome                float32           `json:"cspHome"`
+	HSPHome                float32           `json:"hspHome"`
 	FanCirculateSpeed      FanCirculateSpeed `json:"fanCirculateSpeed"`
 	EquipmentStatus        EquipmentStatus   `json:"equipmentStatus"`
 	HumOutdoor             int               `json:"humOutdoor"`
