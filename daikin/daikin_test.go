@@ -2,6 +2,7 @@ package daikin_test
 
 import (
 	"path"
+	"strconv"
 	"testing"
 
 	"github.com/h2non/gock"
@@ -76,3 +77,60 @@ func TestGetDeviceInfo(t *testing.T) {
 	st.Expect(t, gock.IsDone(), true)
 }
 
+func TestSetMode(t *testing.T) {
+	defer gock.Off()
+
+	email := "test@test.com"
+	password := "mypassword"
+	accessToken := "foo"
+	deviceId := "0000000-0000-0000-0000-000000000000"
+	mode := daikin.ModeOff
+
+	gock.New(urlBase).
+		Post("/users/auth/login").
+		JSON(map[string]string{"email": email, "password": password}).
+		Reply(200).
+		JSON(map[string]interface{}{"accessToken": accessToken, "accessTokenExpiresIn": 3600})
+
+	gock.New(urlBase).
+		Put("/deviceData/"+deviceId).
+		MatchHeader("Authorization", "Bearer "+accessToken).
+		JSON(map[string]interface{}{"mode": mode}).
+		Reply(200).
+		JSON(map[string]string{"message": "Write sent"})
+
+	d := daikin.New(email, password)
+	err := d.SetMode(deviceId, mode)
+
+	st.Expect(t, err, nil)
+	st.Expect(t, gock.IsDone(), true)
+}
+
+func TestUpdateDevice(t *testing.T) {
+	defer gock.Off()
+
+	email := "test@test.com"
+	password := "mypassword"
+	accessToken := "foo"
+	deviceId := "0000000-0000-0000-0000-000000000000"
+	mode := daikin.ModeOff
+
+	gock.New(urlBase).
+		Post("/users/auth/login").
+		JSON(map[string]string{"email": email, "password": password}).
+		Reply(200).
+		JSON(map[string]interface{}{"accessToken": accessToken, "accessTokenExpiresIn": 3600})
+
+	gock.New(urlBase).
+		Put("/deviceData/"+deviceId).
+		MatchHeader("Authorization", "Bearer "+accessToken).
+		JSON(map[string]interface{}{"mode": mode, "lightBarBrightness": 2}).
+		Reply(200).
+		JSON(map[string]string{"message": "Write sent"})
+
+	d := daikin.New(email, password)
+	err := d.UpdateDevice(deviceId, `{"mode": `+strconv.Itoa(int(mode))+`, "lightBarBrightness" : 2}`)
+
+	st.Expect(t, err, nil)
+	st.Expect(t, gock.IsDone(), true)
+}

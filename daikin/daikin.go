@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strconv"
 	"time"
 )
 
@@ -212,4 +213,40 @@ func (d *Daikin) GetDeviceInfo(deviceId string) (*DeviceInfo, error) {
 	}
 
 	return &deviceInfo, nil
+}
+
+func (d *Daikin) SetMode(deviceId string, mode Mode) error {
+	json := `{ "mode": ` + strconv.Itoa(int(mode)) + `}`
+	return d.UpdateDevice(deviceId, json)
+}
+
+func (d *Daikin) UpdateDevice(deviceId string, json string) error {
+	body := []byte(json)
+
+	r, err := http.NewRequest("PUT", urlBase+"/deviceData/"+deviceId, bytes.NewBuffer([]byte(body)))
+	if err != nil {
+		return errors.New("http.NewRequest failed")
+	}
+
+	r.Header.Add("content-type", "application/json")
+
+	token, err := d.getToken()
+	if err != nil {
+		return errors.New("getToken did not return a token")
+	}
+
+	r.Header.Add("Authorization", "Bearer "+token)
+
+	res, err := httpClient.Do(r)
+	if err != nil {
+		return errors.New("http request failed")
+	}
+
+	defer res.Body.Close()
+
+	if res.StatusCode != http.StatusOK {
+		return fmt.Errorf("update request returned a non-success response: %s", res.Status)
+	}
+
+	return nil
 }
