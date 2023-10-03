@@ -1,6 +1,7 @@
 package daikin_test
 
 import (
+	"path"
 	"testing"
 
 	"github.com/h2non/gock"
@@ -41,3 +42,37 @@ func TestGetDevices(t *testing.T) {
 
 	st.Expect(t, gock.IsDone(), true)
 }
+
+func TestGetDeviceInfo(t *testing.T) {
+	defer gock.Off()
+
+	email := "test@test.com"
+	password := "mypassword"
+	accessToken := "foo"
+	deviceId := "0000000-0000-0000-0000-000000000000"
+
+	gock.New(urlBase).
+		Post("/users/auth/login").
+		JSON(map[string]string{"email": email, "password": password}).
+		Reply(200).
+		JSON(map[string]interface{}{"accessToken": accessToken, "accessTokenExpiresIn": 3600})
+
+	gock.New(urlBase).
+		Get("/deviceData/"+deviceId).
+		MatchHeader("Authorization", "Bearer "+accessToken).
+		Reply(200).
+		File(path.Join("fixtures", "device_info.json"))
+
+	d := daikin.New(email, password)
+	deviceInfo, err := d.GetDeviceInfo(deviceId)
+
+	t.Log(deviceInfo)
+
+	st.Expect(t, err, nil)
+	st.Expect(t, (*deviceInfo).Mode, daikin.ModeCool)
+	st.Expect(t, (*deviceInfo).CSPActive, float32(22))
+	st.Expect(t, (*deviceInfo).HSPActive, float32(17.5))
+
+	st.Expect(t, gock.IsDone(), true)
+}
+
