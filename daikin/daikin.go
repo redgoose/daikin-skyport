@@ -39,37 +39,37 @@ type Device struct {
 type EquipmentStatus uint8
 
 const (
-	EquipmentStatusCool     EquipmentStatus = 1
-	EquipmentStatusOvercool EquipmentStatus = 2
-	EquipmentStatusHeat     EquipmentStatus = 3
-	EquipmentStatusFan      EquipmentStatus = 4
-	EquipmentStatusIdle     EquipmentStatus = 5
+	EquipmentStatusCool EquipmentStatus = iota + 1
+	EquipmentStatusOvercool
+	EquipmentStatusHeat
+	EquipmentStatusFan
+	EquipmentStatusIdle
 )
 
 type Mode uint8
 
 const (
-	ModeOff    Mode = 0
-	ModeHeat   Mode = 1
-	ModeCool   Mode = 2
-	ModeAuto   Mode = 3
-	ModeEmHeat Mode = 4
+	ModeOff Mode = iota
+	ModeHeat
+	ModeCool
+	ModeAuto
+	ModeEmHeat
 )
 
 type FanCirculateSpeed uint8
 
 const (
-	FanCirculateSpeedLow  FanCirculateSpeed = 0
-	FanCirculateSpeedMed  FanCirculateSpeed = 1
-	FanCirculateSpeedHigh FanCirculateSpeed = 2
+	FanCirculateSpeedLow FanCirculateSpeed = iota
+	FanCirculateSpeedMed
+	FanCirculateSpeedHigh
 )
 
 type FanCirculate uint8
 
 const (
-	FanCirculateOff   FanCirculate = 0
-	FanCirculateOn    FanCirculate = 1
-	FanCirculateSched FanCirculate = 2
+	FanCirculateOff FanCirculate = iota
+	FanCirculateOn
+	FanCirculateSched
 )
 
 type DeviceInfo struct {
