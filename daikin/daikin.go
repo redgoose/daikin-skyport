@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
 	"time"
 )
@@ -92,6 +93,12 @@ type DeviceInfo struct {
 	FanCirculate           FanCirculate      `json:"fanCirculate"`
 	TempOutdoor            float32           `json:"tempOutdoor"`
 	Mode                   Mode              `json:"mode"`
+	TempSPMax              float32           `json:"tempSPMax"`
+	TempSPMin              float32           `json:"tempSPMin"`
+}
+
+type SetTempParams struct {
+	CoolSetpoint, HeatSetpoint float32
 }
 
 func New(email string, password string) *Daikin {
@@ -222,6 +229,63 @@ func (d *Daikin) SetMode(deviceId string, mode Mode) error {
 	if err != nil {
 		return errors.New("json marshal failed")
 	}
+
+	return d.updateDevice(deviceId, json)
+}
+
+func (d *Daikin) SetTemp(deviceId string, params SetTempParams) error {
+
+	if params.CoolSetpoint == params.HeatSetpoint {
+		return errors.New("invalid setpoints provided")
+	}
+
+	if params.CoolSetpoint != 0 && params.HeatSetpoint != 0 &&
+		params.CoolSetpoint < params.HeatSetpoint {
+		return errors.New("cool setpoint can not be lower than heat setpoint")
+	}
+
+	deviceInfo, err := d.GetDeviceInfo(deviceId)
+	if err != nil {
+		return errors.New("get device info failed")
+	}
+
+	if params.CoolSetpoint == 0 {
+		// hsp provided, default csp
+		params.CoolSetpoint = deviceInfo.CSPHome
+
+		if (params.CoolSetpoint - params.HeatSetpoint) < deviceInfo.TempDeltaMin {
+			// min delta not met, increase csp
+			params.CoolSetpoint = params.HeatSetpoint + deviceInfo.TempDeltaMin
+		}
+	}
+
+	if params.HeatSetpoint == 0 {
+		// csp provided, default hsp
+		params.HeatSetpoint = deviceInfo.HSPHome
+
+		if (params.CoolSetpoint - params.HeatSetpoint) < deviceInfo.TempDeltaMin {
+			// min delta not met, lower hsp
+			params.HeatSetpoint = params.CoolSetpoint - deviceInfo.TempDeltaMin
+		}
+	}
+
+	if params.CoolSetpoint < deviceInfo.TempSPMin || params.CoolSetpoint > deviceInfo.TempSPMax ||
+		params.HeatSetpoint < deviceInfo.TempSPMin || params.HeatSetpoint > deviceInfo.TempSPMax {
+		return errors.New("setpoint(s) outside of allowable range")
+	}
+
+	data := map[string]interface{}{
+		"cspHome":       params.CoolSetpoint,
+		"hspHome":       params.HeatSetpoint,
+		"schedOverride": 1,
+	}
+
+	json, err := json.Marshal(data)
+	if err != nil {
+		return errors.New("json marshal failed")
+	}
+
+	log.Println(string(json[:]))
 
 	return d.updateDevice(deviceId, json)
 }

@@ -1,6 +1,7 @@
 package daikin_test
 
 import (
+	"errors"
 	"path"
 	"strconv"
 	"testing"
@@ -131,6 +132,184 @@ func TestUpdateDeviceRaw(t *testing.T) {
 
 	d := daikin.New(email, password)
 	err := d.UpdateDeviceRaw(deviceId, `{"mode": `+strconv.Itoa(int(mode))+`, "lightBarBrightness" : 2}`)
+
+	st.Expect(t, err, nil)
+	st.Expect(t, gock.IsDone(), true)
+}
+
+func TestSetTempNoSetpoints(t *testing.T) {
+	defer gock.Off()
+
+	email := "test@test.com"
+	password := "mypassword"
+	deviceId := "0000000-0000-0000-0000-000000000000"
+
+	d := daikin.New(email, password)
+	params := daikin.SetTempParams{}
+	err := d.SetTemp(deviceId, params)
+
+	st.Expect(t, err, errors.New("invalid setpoints provided"))
+	st.Expect(t, gock.IsDone(), true)
+}
+
+func TestSetTempEqualSetpoints(t *testing.T) {
+	defer gock.Off()
+
+	email := "test@test.com"
+	password := "mypassword"
+	deviceId := "0000000-0000-0000-0000-000000000000"
+
+	d := daikin.New(email, password)
+	params := daikin.SetTempParams{CoolSetpoint: 22, HeatSetpoint: 22}
+	err := d.SetTemp(deviceId, params)
+
+	st.Expect(t, err, errors.New("invalid setpoints provided"))
+	st.Expect(t, gock.IsDone(), true)
+}
+
+func TestSetTempCoolSetpointLower(t *testing.T) {
+	defer gock.Off()
+
+	email := "test@test.com"
+	password := "mypassword"
+	deviceId := "0000000-0000-0000-0000-000000000000"
+
+	d := daikin.New(email, password)
+	params := daikin.SetTempParams{CoolSetpoint: 20, HeatSetpoint: 22}
+	err := d.SetTemp(deviceId, params)
+
+	st.Expect(t, err, errors.New("cool setpoint can not be lower than heat setpoint"))
+	st.Expect(t, gock.IsDone(), true)
+}
+
+func TestSetTempSetpointOutOfRange(t *testing.T) {
+	defer gock.Off()
+
+	email := "test@test.com"
+	password := "mypassword"
+	accessToken := "foo"
+	deviceId := "0000000-0000-0000-0000-000000000000"
+
+	gock.New(urlBase).
+		Post("/users/auth/login").
+		JSON(map[string]string{"email": email, "password": password}).
+		Reply(200).
+		JSON(map[string]interface{}{"accessToken": accessToken, "accessTokenExpiresIn": 3600})
+
+	gock.New(urlBase).
+		Get("/deviceData/"+deviceId).
+		MatchHeader("Authorization", "Bearer "+accessToken).
+		Reply(200).
+		File(path.Join("fixtures", "device_info.json"))
+
+	d := daikin.New(email, password)
+	params := daikin.SetTempParams{CoolSetpoint: 35, HeatSetpoint: 5}
+	err := d.SetTemp(deviceId, params)
+
+	st.Expect(t, err, errors.New("setpoint(s) outside of allowable range"))
+	st.Expect(t, gock.IsDone(), true)
+}
+
+func TestSetTempCoolSetpoint(t *testing.T) {
+	defer gock.Off()
+
+	email := "test@test.com"
+	password := "mypassword"
+	accessToken := "foo"
+	deviceId := "0000000-0000-0000-0000-000000000000"
+
+	gock.New(urlBase).
+		Post("/users/auth/login").
+		JSON(map[string]string{"email": email, "password": password}).
+		Reply(200).
+		JSON(map[string]interface{}{"accessToken": accessToken, "accessTokenExpiresIn": 3600})
+
+	gock.New(urlBase).
+		Get("/deviceData/"+deviceId).
+		MatchHeader("Authorization", "Bearer "+accessToken).
+		Reply(200).
+		File(path.Join("fixtures", "device_info.json"))
+
+	gock.New(urlBase).
+		Put("/deviceData/"+deviceId).
+		MatchHeader("Authorization", "Bearer "+accessToken).
+		JSON(map[string]interface{}{"cspHome": 17.5, "hspHome": 16, "schedOverride": 1}).
+		Reply(200).
+		JSON(map[string]string{"message": "Write sent"})
+
+	d := daikin.New(email, password)
+	params := daikin.SetTempParams{CoolSetpoint: 17.5}
+	err := d.SetTemp(deviceId, params)
+
+	st.Expect(t, err, nil)
+	st.Expect(t, gock.IsDone(), true)
+}
+
+func TestSetTempHeatSetpoint(t *testing.T) {
+	defer gock.Off()
+
+	email := "test@test.com"
+	password := "mypassword"
+	accessToken := "foo"
+	deviceId := "0000000-0000-0000-0000-000000000000"
+
+	gock.New(urlBase).
+		Post("/users/auth/login").
+		JSON(map[string]string{"email": email, "password": password}).
+		Reply(200).
+		JSON(map[string]interface{}{"accessToken": accessToken, "accessTokenExpiresIn": 3600})
+
+	gock.New(urlBase).
+		Get("/deviceData/"+deviceId).
+		MatchHeader("Authorization", "Bearer "+accessToken).
+		Reply(200).
+		File(path.Join("fixtures", "device_info.json"))
+
+	gock.New(urlBase).
+		Put("/deviceData/"+deviceId).
+		MatchHeader("Authorization", "Bearer "+accessToken).
+		JSON(map[string]interface{}{"cspHome": 23.5, "hspHome": 22, "schedOverride": 1}).
+		Reply(200).
+		JSON(map[string]string{"message": "Write sent"})
+
+	d := daikin.New(email, password)
+	params := daikin.SetTempParams{HeatSetpoint: 22}
+	err := d.SetTemp(deviceId, params)
+
+	st.Expect(t, err, nil)
+	st.Expect(t, gock.IsDone(), true)
+}
+
+func TestSetTempBothSetpoints(t *testing.T) {
+	defer gock.Off()
+
+	email := "test@test.com"
+	password := "mypassword"
+	accessToken := "foo"
+	deviceId := "0000000-0000-0000-0000-000000000000"
+
+	gock.New(urlBase).
+		Post("/users/auth/login").
+		JSON(map[string]string{"email": email, "password": password}).
+		Reply(200).
+		JSON(map[string]interface{}{"accessToken": accessToken, "accessTokenExpiresIn": 3600})
+
+	gock.New(urlBase).
+		Get("/deviceData/"+deviceId).
+		MatchHeader("Authorization", "Bearer "+accessToken).
+		Reply(200).
+		File(path.Join("fixtures", "device_info.json"))
+
+	gock.New(urlBase).
+		Put("/deviceData/"+deviceId).
+		MatchHeader("Authorization", "Bearer "+accessToken).
+		JSON(map[string]interface{}{"cspHome": 20, "hspHome": 18, "schedOverride": 1}).
+		Reply(200).
+		JSON(map[string]string{"message": "Write sent"})
+
+	d := daikin.New(email, password)
+	params := daikin.SetTempParams{CoolSetpoint: 20, HeatSetpoint: 18}
+	err := d.SetTemp(deviceId, params)
 
 	st.Expect(t, err, nil)
 	st.Expect(t, gock.IsDone(), true)
