@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"strconv"
 	"time"
 )
 
@@ -217,14 +216,23 @@ func (d *Daikin) GetDeviceInfo(deviceId string) (*DeviceInfo, error) {
 }
 
 func (d *Daikin) SetMode(deviceId string, mode Mode) error {
-	json := `{ "mode": ` + strconv.Itoa(int(mode)) + `}`
-	return d.UpdateDevice(deviceId, json)
+	data := map[string]interface{}{"mode": mode}
+
+	json, err := json.Marshal(data)
+	if err != nil {
+		return errors.New("json marshal failed")
+	}
+
+	return d.updateDevice(deviceId, json)
 }
 
-func (d *Daikin) UpdateDevice(deviceId string, json string) error {
-	body := []byte(json)
+func (d *Daikin) UpdateDeviceRaw(deviceId string, json string) error {
+	return d.updateDevice(deviceId, []byte(json))
+}
 
-	r, err := http.NewRequest("PUT", d.urlBase+"/deviceData/"+deviceId, bytes.NewBuffer([]byte(body)))
+func (d *Daikin) updateDevice(deviceId string, body []byte) error {
+
+	r, err := http.NewRequest("PUT", d.urlBase+"/deviceData/"+deviceId, bytes.NewBuffer(body))
 	if err != nil {
 		return errors.New("http.NewRequest failed")
 	}

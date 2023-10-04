@@ -107,7 +107,7 @@ func TestSetMode(t *testing.T) {
 	st.Expect(t, gock.IsDone(), true)
 }
 
-func TestUpdateDevice(t *testing.T) {
+func TestUpdateDeviceRaw(t *testing.T) {
 	defer gock.Off()
 
 	email := "test@test.com"
@@ -130,7 +130,7 @@ func TestUpdateDevice(t *testing.T) {
 		JSON(map[string]string{"message": "Write sent"})
 
 	d := daikin.New(email, password)
-	err := d.UpdateDevice(deviceId, `{"mode": `+strconv.Itoa(int(mode))+`, "lightBarBrightness" : 2}`)
+	err := d.UpdateDeviceRaw(deviceId, `{"mode": `+strconv.Itoa(int(mode))+`, "lightBarBrightness" : 2}`)
 
 	st.Expect(t, err, nil)
 	st.Expect(t, gock.IsDone(), true)
