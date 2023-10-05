@@ -8,7 +8,7 @@ Note: This library uses an undocumented API that is currently used by the [Daiki
 
 ## Installation
 
-```sh
+```
 go get -u github.com/redgoose/daikin-skyport
 ```
 
@@ -44,6 +44,7 @@ Full docs can be found [here](https://pkg.go.dev/github.com/redgoose/daikin-skyp
 ## Testing
 
 Run all integration tests from the root folder by running:
-```sh
-go test ./... -v
+
+```
+go test -v
 ```
