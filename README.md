@@ -30,6 +30,15 @@ d := daikin.New("your@email.com", "yourPassword")
 deviceInfo, err := d.GetDeviceInfo("0000000-0000-0000-0000-000000000000")
 ```
 
+You can use the built-in functions like above or make direct JSON requests using the `UpdateDeviceRaw` function.
+
+```go
+d := daikin.New("your@email.com", "yourPassword")
+err := d.UpdateDeviceRaw("0000000-0000-0000-0000-000000000000", `{"mode": 2, "lightBarBrightness" : 2}`)
+```
+
+You can include as many properties in a single request as long as it is valid.
+
 Full docs can be found [here](https://pkg.go.dev/github.com/redgoose/daikin-skyport).
 
 ## Testing
