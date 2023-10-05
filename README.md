@@ -18,18 +18,27 @@ go get -u github.com/redgoose/daikin-skyport
 
 This library requires the email and password associated with your Daikin account.
 
+```go
+d := daikin.New("your@email.com", "yourPassword")
+```
+
 ### List devices
 
 ```go
-d := daikin.New("your@email.com", "yourPassword")
 devices, err := d.GetDevices()
 ```
 
 ### Get device info
 
 ```go
-d := daikin.New("your@email.com", "yourPassword")
 deviceInfo, err := d.GetDeviceInfo("0000000-0000-0000-0000-000000000000")
+```
+
+### Set cooling temperature
+
+```go
+params := daikin.SetTempParams{CoolSetpoint: 17.5}
+err := d.SetTemp(deviceId, params)
 ```
 
 You can use the built-in functions like above or make direct JSON requests using the `UpdateDeviceRaw` function.
