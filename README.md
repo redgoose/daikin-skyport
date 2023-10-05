@@ -4,7 +4,9 @@
 
 Daikin Skyport is a library for interacting with Daikin One+ devices/thermostats.
 
-Note: This library uses an undocumented API that is currently used by the [Daikin One Home mobile app](https://www.daikinone.com/product/one-home-mobile-app). As such, the API could change at any moment and break this library. For a more stable, but less feature rich library based on published docs, check out the [Daikin Skyport Integrator API](https://github.com/redgoose/daikin-skyport-integrator).
+This library uses an undocumented API that is currently used by the [Daikin One Home mobile app](https://www.daikinone.com/product/one-home-mobile-app). As such, the API could change at any moment and break this library.
+
+For a more stable, but less feature rich library based on published docs, check out the [Daikin Skyport Integrator API](https://github.com/redgoose/daikin-skyport-integrator).
 
 ## Installation
 
