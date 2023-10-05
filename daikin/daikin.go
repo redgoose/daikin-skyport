@@ -156,6 +156,39 @@ func (d *Daikin) SetMode(deviceId string, mode Mode) error {
 	return d.updateDevice(deviceId, json)
 }
 
+func (d *Daikin) SetFanMode(deviceId string, fan_mode FanCirculate) error {
+	data := map[string]interface{}{"fanCirculate": fan_mode}
+
+	json, err := json.Marshal(data)
+	if err != nil {
+		return errors.New("json marshal failed")
+	}
+
+	return d.updateDevice(deviceId, json)
+}
+
+func (d *Daikin) SetFanSpeed(deviceId string, fan_speed FanCirculateSpeed) error {
+	data := map[string]interface{}{"fanCirculateSpeed": fan_speed}
+
+	json, err := json.Marshal(data)
+	if err != nil {
+		return errors.New("json marshal failed")
+	}
+
+	return d.updateDevice(deviceId, json)
+}
+
+func (d *Daikin) SetFanClean(deviceId string, fan_clean_active bool) error {
+	data := map[string]interface{}{"oneCleanFanActive": fan_clean_active}
+
+	json, err := json.Marshal(data)
+	if err != nil {
+		return errors.New("json marshal failed")
+	}
+
+	return d.updateDevice(deviceId, json)
+}
+
 func (d *Daikin) SetTemp(deviceId string, params SetTempParams) error {
 
 	if params.CoolSetpoint == params.HeatSetpoint {

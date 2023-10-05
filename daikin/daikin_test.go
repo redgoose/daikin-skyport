@@ -314,3 +314,91 @@ func TestSetTempBothSetpoints(t *testing.T) {
 	st.Expect(t, err, nil)
 	st.Expect(t, gock.IsDone(), true)
 }
+
+func TestSetFanMode(t *testing.T) {
+	defer gock.Off()
+
+	email := "test@test.com"
+	password := "mypassword"
+	accessToken := "foo"
+	deviceId := "0000000-0000-0000-0000-000000000000"
+	fan_mode := daikin.FanCirculateOn
+
+	gock.New(urlBase).
+		Post("/users/auth/login").
+		JSON(map[string]string{"email": email, "password": password}).
+		Reply(200).
+		JSON(map[string]interface{}{"accessToken": accessToken, "accessTokenExpiresIn": 3600})
+
+	gock.New(urlBase).
+		Put("/deviceData/"+deviceId).
+		MatchHeader("Authorization", "Bearer "+accessToken).
+		JSON(map[string]interface{}{"fanCirculate": fan_mode}).
+		Reply(200).
+		JSON(map[string]string{"message": "Write sent"})
+
+	d := daikin.New(email, password)
+	err := d.SetFanMode(deviceId, fan_mode)
+
+	st.Expect(t, err, nil)
+	st.Expect(t, gock.IsDone(), true)
+}
+
+func TestSetFanSpeed(t *testing.T) {
+	defer gock.Off()
+
+	email := "test@test.com"
+	password := "mypassword"
+	accessToken := "foo"
+	deviceId := "0000000-0000-0000-0000-000000000000"
+	fan_speed := daikin.FanCirculateSpeedHigh
+
+	gock.New(urlBase).
+		Post("/users/auth/login").
+		JSON(map[string]string{"email": email, "password": password}).
+		Reply(200).
+		JSON(map[string]interface{}{"accessToken": accessToken, "accessTokenExpiresIn": 3600})
+
+	gock.New(urlBase).
+		Put("/deviceData/"+deviceId).
+		MatchHeader("Authorization", "Bearer "+accessToken).
+		JSON(map[string]interface{}{"fanCirculateSpeed": fan_speed}).
+		Reply(200).
+		JSON(map[string]string{"message": "Write sent"})
+
+	d := daikin.New(email, password)
+	err := d.SetFanSpeed(deviceId, fan_speed)
+
+	st.Expect(t, err, nil)
+	st.Expect(t, gock.IsDone(), true)
+}
+
+func TestSetFanClean(t *testing.T) {
+	defer gock.Off()
+	// gock.Observe(gock.DumpRequest)
+
+	email := "test@test.com"
+	password := "mypassword"
+	accessToken := "foo"
+	deviceId := "0000000-0000-0000-0000-000000000000"
+	fan_clean_active := true
+
+	gock.New(urlBase).
+		Post("/users/auth/login").
+		JSON(map[string]string{"email": email, "password": password}).
+		Reply(200).
+		JSON(map[string]interface{}{"accessToken": accessToken, "accessTokenExpiresIn": 3600})
+
+	gock.New(urlBase).
+		Put("/deviceData/"+deviceId).
+		MatchHeader("Authorization", "Bearer "+accessToken).
+		JSON(map[string]interface{}{"oneCleanFanActive": fan_clean_active}).
+		Reply(200).
+		JSON(map[string]string{"message": "Write sent"})
+
+	d := daikin.New(email, password)
+	err := d.SetFanClean(deviceId, fan_clean_active)
+
+	st.Expect(t, err, nil)
+	st.Expect(t, gock.IsDone(), true)
+}
