@@ -16,19 +16,21 @@ go get -u github.com/redgoose/daikin-skyport
 
 This library requires the email and password associated with your Daikin account.
 
-### Get a list of all devices associated with your account
+### List devices
 
 ```go
 d := daikin.New("your@email.com", "yourPassword")
 devices, err := d.GetDevices()
 ```
 
-### Get info for a given deviceId
+### Get device info
 
 ```go
 d := daikin.New("your@email.com", "yourPassword")
 deviceInfo, err := d.GetDeviceInfo("0000000-0000-0000-0000-000000000000")
 ```
+
+Full docs can be found [here](https://pkg.go.dev/github.com/redgoose/daikin-skyport).
 
 ## Testing
 
