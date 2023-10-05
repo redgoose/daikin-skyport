@@ -8,7 +8,7 @@ import (
 
 	"github.com/h2non/gock"
 	"github.com/nbio/st"
-	"github.com/redgoose/daikin-skyport/daikin"
+	"github.com/redgoose/daikin-skyport"
 )
 
 var urlBase = "https://api.daikinskyport.com"
