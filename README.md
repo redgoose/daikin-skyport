@@ -8,7 +8,7 @@ Note: This library uses an undocumented API that is currently used by the [Daiki
 
 ## Installation
 
-```
+```sh
 go get -u github.com/redgoose/daikin-skyport
 ```
 
@@ -18,14 +18,14 @@ This library requires the email and password associated with your Daikin account
 
 ### Get a list of all devices associated with your account
 
-```
+```go
 d := daikin.New("your@email.com", "yourPassword")
 devices, err := d.GetDevices()
 ```
 
 ### Get info for a given deviceId
 
-```
+```go
 d := daikin.New("your@email.com", "yourPassword")
 deviceInfo, err := d.GetDeviceInfo("0000000-0000-0000-0000-000000000000")
 ```
@@ -33,6 +33,6 @@ deviceInfo, err := d.GetDeviceInfo("0000000-0000-0000-0000-000000000000")
 ## Testing
 
 Run all integration tests from the root folder by running:
-```
+```sh
 go test ./... -v
 ```
