@@ -44,7 +44,6 @@ err := d.SetTemp(deviceId, params)
 You can use the built-in functions like above or make direct JSON requests using the `UpdateDeviceRaw` function.
 
 ```go
-d := daikin.New("your@email.com", "yourPassword")
 err := d.UpdateDeviceRaw("0000000-0000-0000-0000-000000000000", `{"mode": 2, "lightBarBrightness" : 2}`)
 ```
 
