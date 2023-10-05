@@ -19,86 +19,9 @@ type Daikin struct {
 	urlBase        string
 }
 
-type Token struct {
-	AccessToken          string `json:"accessToken"`
-	AccessTokenExpiresIn int    `json:"accessTokenExpiresIn"`
-	RefreshToken         string `json:"refreshToken"`
-	TokenType            string `json:"tokenType"`
-}
-
-type Devices []Device
-
-type Device struct {
-	Id              string `json:"id"`
-	LocationId      string `json:"locationId"`
-	Name            string `json:"name"`
-	Model           string `json:"model"`
-	FirmwareVersion string `json:"firmwareVersion"`
-	CreatedDate     int    `json:"createdDate"`
-	HasOwner        bool   `json:"hasOwner"`
-	HasWrite        bool   `json:"hasWrite"`
-}
-
-type EquipmentStatus uint8
-
-const (
-	EquipmentStatusCool EquipmentStatus = iota + 1
-	EquipmentStatusOvercool
-	EquipmentStatusHeat
-	EquipmentStatusFan
-	EquipmentStatusIdle
-)
-
-type Mode uint8
-
-const (
-	ModeOff Mode = iota
-	ModeHeat
-	ModeCool
-	ModeAuto
-	ModeEmHeat
-)
-
-type FanCirculateSpeed uint8
-
-const (
-	FanCirculateSpeedLow FanCirculateSpeed = iota
-	FanCirculateSpeedMed
-	FanCirculateSpeedHigh
-)
-
-type FanCirculate uint8
-
-const (
-	FanCirculateOff FanCirculate = iota
-	FanCirculateOn
-	FanCirculateSched
-)
-
-type DeviceInfo struct {
-	CSPHome                float32           `json:"cspHome"`
-	HSPHome                float32           `json:"hspHome"`
-	FanCirculateSpeed      FanCirculateSpeed `json:"fanCirculateSpeed"`
-	EquipmentStatus        EquipmentStatus   `json:"equipmentStatus"`
-	HumOutdoor             int               `json:"humOutdoor"`
-	TempIndoor             float32           `json:"tempIndoor"`
-	TempDeltaMin           float32           `json:"tempDeltaMin"`
-	EquipmentCommunication int               `json:"equipmentCommunication"`
-	ModeEmHeatAvailable    bool              `json:"modeEmHeatAvailable"`
-	GeofencingEnabled      bool              `json:"geofencingEnabled"`
-	SchedEnabled           bool              `json:"schedEnabled"`
-	HumIndoor              int               `json:"humIndoor"`
-	ModeLimit              int               `json:"modeLimit"`
-	Fan                    bool              `json:"fan"`
-	FanCirculate           FanCirculate      `json:"fanCirculate"`
-	TempOutdoor            float32           `json:"tempOutdoor"`
-	Mode                   Mode              `json:"mode"`
-	TempSPMax              float32           `json:"tempSPMax"`
-	TempSPMin              float32           `json:"tempSPMin"`
-}
-
 type SetTempParams struct {
-	CoolSetpoint, HeatSetpoint float32
+	CoolSetpoint float32
+	HeatSetpoint float32
 }
 
 func New(email string, password string) *Daikin {
@@ -251,7 +174,7 @@ func (d *Daikin) SetTemp(deviceId string, params SetTempParams) error {
 
 	if params.CoolSetpoint == 0 {
 		// hsp provided, default csp
-		params.CoolSetpoint = deviceInfo.CSPHome
+		params.CoolSetpoint = deviceInfo.CspHome
 
 		if (params.CoolSetpoint - params.HeatSetpoint) < deviceInfo.TempDeltaMin {
 			// min delta not met, increase csp
@@ -261,7 +184,7 @@ func (d *Daikin) SetTemp(deviceId string, params SetTempParams) error {
 
 	if params.HeatSetpoint == 0 {
 		// csp provided, default hsp
-		params.HeatSetpoint = deviceInfo.HSPHome
+		params.HeatSetpoint = deviceInfo.HspHome
 
 		if (params.CoolSetpoint - params.HeatSetpoint) < deviceInfo.TempDeltaMin {
 			// min delta not met, lower hsp

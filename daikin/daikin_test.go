@@ -68,13 +68,13 @@ func TestGetDeviceInfo(t *testing.T) {
 	d := daikin.New(email, password)
 	deviceInfo, err := d.GetDeviceInfo(deviceId)
 
-	t.Log(deviceInfo)
+	// t.Log(deviceInfo)
 
 	st.Expect(t, err, nil)
 	st.Expect(t, (*deviceInfo).Mode, daikin.ModeCool)
 	st.Expect(t, (*deviceInfo).EquipmentStatus, daikin.EquipmentStatusOvercool)
-	st.Expect(t, (*deviceInfo).CSPHome, float32(22))
-	st.Expect(t, (*deviceInfo).HSPHome, float32(17.5))
+	st.Expect(t, (*deviceInfo).CspHome, float32(22))
+	st.Expect(t, (*deviceInfo).HspHome, float32(17.5))
 
 	st.Expect(t, gock.IsDone(), true)
 }
