@@ -48,3 +48,7 @@ Run all integration tests from the root folder by running:
 ```
 go test -v
 ```
+
+## License
+
+MIT © redgoose, see [LICENSE](https://github.com/redgoose/daikin-skyport/blob/master/LICENSE) for details.
