@@ -41,6 +41,8 @@ params := daikin.SetTempParams{CoolSetpoint: 17.5}
 err := d.SetTemp(deviceId, params)
 ```
 
+### Direct JSON requests
+
 You can use the built-in functions like above or make direct JSON requests using the `UpdateDeviceRaw` function.
 
 ```go
@@ -53,7 +55,7 @@ Full docs can be found [here](https://pkg.go.dev/github.com/redgoose/daikin-skyp
 
 ## Testing
 
-Run all integration tests from the root folder by running:
+Run all tests from the root folder by running:
 
 ```
 go test -v
